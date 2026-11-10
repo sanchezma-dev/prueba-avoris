@@ -1,0 +1,122 @@
+openapi: "3.0.3"
+info:
+  title: Hotel Availability Searches API
+  version: 1.0.0
+tags:
+  - name: hotel-availability
+paths:
+  /search:
+    post:
+      tags:
+        - hotel-availability
+      operationId: search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /count:
+    get:
+      tags:
+        - hotel-availability
+      operationId: count
+      parameters:
+        - name: searchId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountResponse'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    SearchRequest:
+      type: object
+      required:
+        - hotelId
+        - checkIn
+        - checkOut
+        - ages
+      properties:
+        hotelId:
+          type: string
+          minLength: 1
+          example: "1234aBc"
+        checkIn:
+          type: string
+          format: date
+          example: "29-12-2023"
+          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")'
+        checkOut:
+          type: string
+          format: date
+          example: "31-12-2023"
+          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")'
+        # FIXME(2): restricciones de ages no definidas en el enunciado — provisional: minItems 1 y edad mínima 0 sin máximo
+        ages:
+          type: array
+          items:
+            type: integer
+            format: int32
+            minimum: 0
+          minItems: 1
+          example: [30, 29, 1, 3]
+    SearchResponse:
+      type: object
+      required:
+        - searchId
+      properties:
+        searchId:
+          type: string
+          format: uuid
+    CountResponse:
+      type: object
+      required:
+        - count
+      properties:
+        searchId:
+          type: string
+          format: uuid
+        search:
+          $ref: '#/components/schemas/SearchRequest'
+        count:
+          type: integer
+          format: int64
+          minimum: 0
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+        message:
+          type: string

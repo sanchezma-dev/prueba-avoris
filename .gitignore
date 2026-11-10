@@ -1,0 +1,9 @@
+node_modules/
+target/
+build/
+dist/
+.idea/
+.vscode/
+*.log
+.env
+CLAUDE.local.md
